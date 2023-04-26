@@ -1,13 +1,14 @@
 #include "game.hpp"
 
-Game::Game(std::mt19937 gen)
+Game::Game(std::mt19937 gen, Snake *snk)
 {
     m_gen = gen;
     std::uniform_int_distribution<> dis(0, 3);
+    snake = snk;
 }
 
 
-void Game::updateFood(Snake *snake){
+void Game::updateFood(){
     std::deque<std::pair<int, int>> body = snake->getBody();
     int limX = snake->getBoardLimX(), limY = snake->getBoardLimY();
     if (body.size() == static_cast<std::size_t>(limX) * limY){
@@ -26,6 +27,10 @@ void Game::updateFood(Snake *snake){
     foodY = randY;
 }
 
+int Game::updateSnake(){
+    int movement = snake->move(foodX, foodY);
+    return movement;
+}
 
 int Game::getFoodX(){
     return foodX;
@@ -35,5 +40,3 @@ int Game::getFoodX(){
 int Game::getFoodY(){
     return foodY;
 }
-
-

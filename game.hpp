@@ -5,15 +5,22 @@
 #include <random>
 #include <vector>
 #include <algorithm>
+#include <iostream>
+#include <QTimer>
+#include <QEventLoop>
+#include <QObject>
 
-class Game
-{
+
+class Game {
+    Q_OBJECT
 public:
-    Game(std::mt19937 gen);
-    void updateFood(Snake *snake);
+    Game(std::mt19937 gen, Snake *snk);
+    void updateFood();
+    int updateSnake();
     int getFoodX();
     int getFoodY();
 private:
+    Snake *snake;
     int foodX, foodY;
     std::mt19937 m_gen;
 };

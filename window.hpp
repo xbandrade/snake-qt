@@ -17,7 +17,6 @@
 #include <random>
 #include <iostream>
 
-class QPushButton;
 
 class Window : public QWidget{
     Q_OBJECT
@@ -27,7 +26,7 @@ signals:
     void snakeDied();
 private slots:
     void updateWindow();
-    void gameOver();
+    void restartWidgets();
 private:
     void updateSnakeHead();
     void updateFoodPosition(bool constructorCall = false);

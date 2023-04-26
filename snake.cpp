@@ -47,6 +47,13 @@ int Snake::move(int foodX, int foodY){
     return 0;
 }
 
+void Snake::setNewHead(std::pair<int, int> newHead){
+    body.clear();
+    body.push_back(newHead);
+    x = newHead.first;
+    y = newHead.second;
+}
+
 
 bool Snake::setDir(int direction){
     if (direction == previous[dir]){

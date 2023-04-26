@@ -16,6 +16,7 @@ public:
     int getY();
     int getBoardLimX();
     int getBoardLimY();
+    void setNewHead(std::pair<int, int>);
     const std::deque<std::pair<int, int>> &getBody();
 private:
     int x, y, dir;  // dir 0: up, 1: left, 2: down, 3: right
