@@ -82,7 +82,6 @@ void Window::updateWindow(){
         QEventLoop loop;
         QTimer::singleShot(3500, &loop, &QEventLoop::quit);
         loop.exec();
-        restartWidgets();
     }
     else if (movement == 0){  // snake moved
         QWidget *tail = snakeBodyWidgets.back();

@@ -8,11 +8,9 @@
 #include <iostream>
 #include <QTimer>
 #include <QEventLoop>
-#include <QObject>
 
 
 class Game {
-    Q_OBJECT
 public:
     Game(std::mt19937 gen, Snake *snk);
     void updateFood();

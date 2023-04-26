@@ -32,10 +32,6 @@ int Snake::move(int foodX, int foodY){
     }
     auto it = std::find(body.begin(), body.end(), std::make_pair(x, y));
     if (it != body.end()){
-        body.clear();
-        body.push_back({5, 5});
-        x = 5;
-        y = 5;
         return -1;
     }
     if (x == foodX && y == foodY){
@@ -53,7 +49,6 @@ void Snake::setNewHead(std::pair<int, int> newHead){
     x = newHead.first;
     y = newHead.second;
 }
-
 
 bool Snake::setDir(int direction){
     if (direction == previous[dir]){
