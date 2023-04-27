@@ -4,28 +4,36 @@
 Window::Window(QWidget *parent) : QWidget(parent){
     std::random_device rd;
     m_gen = std::mt19937(rd());
+    setMouseTracking(true);
+    setAttribute(Qt::WA_MouseTracking);
     snake = new Snake;
     game = new Game(m_gen, snake);
     squareSize = 48;
+    cellSize = 50;
     setFixedSize(800, 600);
     setStyleSheet("background-color: #a8bebf;");
     gridContainerWrapper = new QWidget(this);
-    int boardX = snake->getBoardLimX();
-    int boardY = snake->getBoardLimY();
-    gridContainerWrapper->setFixedSize(boardX * 50, boardY * 50);
+    boardX = snake->getBoardLimX();
+    boardY = snake->getBoardLimY();
+    gridContainerWrapper->setFixedSize(boardX * cellSize, boardY * cellSize);
     gridContainerWrapper->setStyleSheet("border: 1px solid black");
+    gridContainerWrapper->setAttribute(Qt::WA_MouseTracking);
+    gridContainerWrapper->setMouseTracking(true);
     mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(gridContainerWrapper);
     mainLayout->setAlignment(Qt::AlignCenter);
     gridContainer = new QWidget(gridContainerWrapper);
-    gridContainer->setFixedSize(boardX * 50, boardY * 50);
+    gridContainer->setFixedSize(boardX * cellSize, boardY * cellSize);
     gridContainer->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    gridContainer->setAttribute(Qt::WA_MouseTracking);
+    gridContainer->setMouseTracking(true);
     gridLayout = new QGridLayout(gridContainer);
     gridLayout->setSpacing(0);
     for (int row = 0; row < boardX; ++row) {
         for (int col = 0; col < boardY; ++col) {
             QWidget* gridWidget = new QWidget(gridContainer);
             gridWidget->setStyleSheet("border: 1px dashed gray");
+            gridWidget->setMouseTracking(true);
             gridLayout->addWidget(gridWidget, row, col);
         }
     }
@@ -34,7 +42,7 @@ Window::Window(QWidget *parent) : QWidget(parent){
     updateTimer = new QTimer(this);
     connect(updateTimer, &QTimer::timeout, this, &Window::updateWindow);
     connect(this, &Window::snakeDied, this, &Window::restartWidgets);
-    updateTimer->start(50);
+    updateTimer->start(150);
 }
 
 
@@ -45,11 +53,12 @@ void Window::updateSnakeHead(){
     if (snakeBodyWidgets.size() >= 1){
         QWidget *snakeTail = snakeBodyWidgets.front();
         snakeTail->setStyleSheet("background-color: #869c9e");
+        snakeTail->setAttribute(Qt::WA_TransparentForMouseEvents);
     }
     snakeBodyWidgets.push_front(snakeHeadWidget);
     int snakeHeadX = snake->getX();
     int snakeHeadY = snake->getY();
-    gridLayout->addWidget(snakeHeadWidget, snakeHeadY, snakeHeadX);
+    gridLayout->addWidget(snakeHeadWidget, snakeHeadX, snakeHeadY);
 }
 
 void Window::updateFoodPosition(bool constructorCall){
@@ -62,18 +71,14 @@ void Window::updateFoodPosition(bool constructorCall){
     foodWidget = new QWidget(gridContainer);
     foodWidget->setStyleSheet("background-color: #b51b10");
     foodWidget->setFixedSize(squareSize, squareSize);
+    foodWidget->setAttribute(Qt::WA_TransparentForMouseEvents);
     int foodX = game->getFoodX();
     int foodY = game->getFoodY();
-    gridLayout->addWidget(foodWidget, foodY, foodX);
+    gridLayout->addWidget(foodWidget, foodX, foodY);
 }
 
 
 void Window::updateWindow(){
-    std::uniform_int_distribution<> dis(0, 3);
-    bool canMove;
-    do{
-        canMove = snake->setDir(dis(m_gen));
-    }while (!canMove);
     int movement = game->updateSnake();
     if (movement == -1){  // snake died
         QTimer::singleShot(3500, this, [=]() {
@@ -109,4 +114,65 @@ void Window::restartWidgets(){
     updateSnakeHead();
     updateFoodPosition();
     snake->setNewHead({5, 5});
+}
+
+
+void Window::mouseMoveEvent(QMouseEvent* event){
+    QPoint globalPos = event->globalPosition().toPoint();
+    QPoint localPos = gridContainer->mapFromGlobal(globalPos);
+    if (gridContainer->rect().contains(localPos)) {
+        int row = localPos.y() / cellSize;
+        int col = localPos.x() / cellSize;
+        if (row >= 0 && row < boardX && col >= 0 && col < boardY) {
+            int snakeX = snake->getX(), snakeY = snake->getY();
+            int diffX = row - snakeX, diffY = col - snakeY;
+            /*std::cout << snake->getY() << " - " << snake->getX() << std::endl;
+            std::cout << row << " * " << col << std::endl;
+            std::cout << diffX << " ~ " << diffY << std::endl;*/
+            if ((diffX < 0) && (diffY < 0)){
+                if (diffX <= diffY){
+                    snake->setDir(1);
+                }
+                else {
+                    snake->setDir(0);
+                }
+            }
+            else if ((diffX > 0) && (diffY > 0)){
+                if (diffX <= diffY){
+                    snake->setDir(3);
+                }
+                else {
+                    snake->setDir(2);
+                }
+            }
+            else if ((diffX < 0) && (diffY > 0)){
+                if (diffX <= diffY){
+                    snake->setDir(3);
+                }
+                else {
+                    snake->setDir(0);
+                }
+            }
+            else if ((diffX > 0) && (diffY < 0)){
+                if (diffX <= diffY){
+                    snake->setDir(1);
+                }
+                else {
+                    snake->setDir(2);
+                }
+            }
+            else if (diffY > 0){
+                snake->setDir(3);
+            }
+            else if (diffY < 0){
+                snake->setDir(1);
+            }
+            else if (diffX > 0){
+                snake->setDir(2);
+            }
+            else if (diffX < 0){
+                snake->setDir(0);
+            }
+        }
+    }
 }

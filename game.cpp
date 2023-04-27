@@ -13,7 +13,7 @@ void Game::updateFood(){
     if (body.size() == static_cast<std::size_t>(limX) * limY){
         return;
     }
-    std::uniform_int_distribution<> disX(0, limX - 1), (0, limY - 1);
+    std::uniform_int_distribution<> disX(0, limX - 1), disY(0, limY - 1);
     int randX = disX(m_gen), randY = disY(m_gen);
     auto it = std::find(
         body.begin(), body.end(), std::make_pair(randX, randY)
@@ -30,6 +30,7 @@ void Game::updateFood(){
 }
 
 int Game::updateSnake(){
+    std::uniform_int_distribution<> dis(0, 3);
     int movement = snake->move(foodX, foodY);
     return movement;
 }

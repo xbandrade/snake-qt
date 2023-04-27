@@ -13,6 +13,7 @@
 #include <QGridLayout>
 #include <QTimer>
 #include <QRect>
+#include <QMouseEvent>
 #include <deque>
 #include <random>
 #include <iostream>
@@ -24,6 +25,8 @@ public:
     explicit Window(QWidget *parent = 0);
 signals:
     void snakeDied();
+protected:
+    void mouseMoveEvent(QMouseEvent* event) override;
 private slots:
     void updateWindow();
     void restartWidgets();
@@ -41,6 +44,6 @@ private:
     QVBoxLayout* gridCellLayout;
     QHBoxLayout* gridCellHBoxLayout;
     QWidget *foodWidget;
-    int squareSize;
+    int squareSize, cellSize, boardX, boardY;
 };
 #endif
